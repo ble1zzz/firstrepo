@@ -57,3 +57,4 @@ def get_weather(message):
             humidity = data['main']['humidity']
             pressure = data['main']['pressure']
             wind_speed = data['main']['wind_speed']
+            
