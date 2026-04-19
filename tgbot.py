@@ -8,7 +8,7 @@ api_key = 'cc2ba876736132e270670f8d7ebb0aef'
 
 base_url = 'https://api.openweathermap.org/data/2.5/weather'
 
-@bot.message_hundler(commands = ['start'])
+@bot.message_handler(commands = ['start'])
 def send_welcome(message):
     welcome_text = (
         'Привет! я Погода-бот.\n\n'
@@ -21,3 +21,32 @@ def send_welcome(message):
     )
     bot.reply_to(message, welcome_text)
 
+@bot.message_handler(commands = ['weather'])
+def get_weather(message):
+    city = message.text.replace('/weather','').strip()
+
+    if not city:
+        bot.reply_to(
+            message,
+            'Пожалуйста, укажите название города\n'
+            'Пример: /weather Mosow'
+        )
+        return
+    
+    try:
+        params = {
+            'q': city,
+            'appid': api_key,
+            'units': 'metric',
+            'lang': 'ru'
+        }
+
+        response = requests.get(base_url, params)
+        data = response.json()
+
+        if response.status_CODE != 200:
+            if data.get('cod') == '404':
+                bot.reply_to(message, f'Город "{city}" не найден. Проверьте написание.')
+            else:
+                bot.reply_to(message, 'Ошибка при получении данных о погоде.')
+                return
